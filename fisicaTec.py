@@ -31,7 +31,7 @@ class Temperature:
         return "Temperature: " + str(self.kelvin()) + "K"
 
 
-class Pressure():
+class Pressure:
     def __init__(self, **kwargs):
         if 'pascal' in kwargs:
             self._pascal = kwargs['pascal']
@@ -132,6 +132,7 @@ class State:
         + volume
         + temperature
         + internal energy
+        + a method to generate PV and TS graphs
     """
 
     def __init__(self,
@@ -144,6 +145,40 @@ class State:
                  moles=None,
                  mass=None,
                  internal_energy=None):
+        self.gas = gas
+        if temperature is not None:
+            self.temperature = temperature
+
+        if volume is not None:
+            self.volume = volume
+
+        if pressure is not None:
+            self.pressure = pressure
+
+        if entropy is not None:
+            self.entropy = entropy
+
+        if enthalpy is not None:
+            self.enthalpy = enthalpy
+
+        if moles is not None:
+            self.moles = moles
+
+        if mass is not None:
+            self.mass = mass
+
+        if internal_energy is not None:
+            self.internal_energy = internal_energy
+
+    def get_enthalpy(self):
+        if self.enthalpy is None:
+            self.enthalpy = self.internal_energy + (self.volume + self.pressure)
+        return self.enthalpy
+
+    def get_pv(self):
+        pass
+
+    def get_ts(self):
         pass
 
     def isocore(self, target_press=None, target_temp=None):
@@ -160,5 +195,22 @@ class State:
 
 
 class Transformation:
-    def __init__(self, state_1, state_2, d_s, d_h, work):
-        pass
+    def __init__(self, state_1, state_2, d_sq, d_sirr, d_h, work):
+        self.d_sirr = d_sirr
+        self.d_sq = d_sq
+        self.state_1 = state_1
+        self.state_2 = state_2
+
+    def is_rev(self):
+        if self.d_sirr == 0:
+            return True
+
+    def is_adiab(self):
+        if self.d_sq == 0:
+            return True
+
+    def get_entrop(self):
+        if self.state_1.entropy is None or self.state_2.entropy is None:
+            return self.d_sirr + self.d_sq # se non avessimo uno dei due valori dovremmo considerare la legge coi logaritmi, che casino scegliere le variabili
+        else:
+            return self.state_2.entropy - self.state_1.entropy
