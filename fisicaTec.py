@@ -1,4 +1,4 @@
-class Temperature():
+class Temperature:
     def __init__(self, **kwargs):
         if 'kelvin' in kwargs:
             self._kelvin = kwargs['kelvin']
@@ -22,13 +22,14 @@ class Temperature():
         raise TypeError()
 
     def __mul__(self, other):
-        return Temperature(kelvin=(other*(self.kelvin())))
-    
+        return Temperature(kelvin=(other * (self.kelvin())))
+
     def __rmul__(self, other):
-        return self*other
+        return self * other
 
     def __repr__(self):
-        return "Temperature: "+str(self.kelvin())+"K"
+        return "Temperature: " + str(self.kelvin()) + "K"
+
 
 class Pressure():
     def __init__(self, **kwargs):
@@ -36,7 +37,7 @@ class Pressure():
             self._pascal = kwargs['pascal']
             return
         if 'bar' in kwargs:
-            self._pascal = 10**5 * kwargs['bar']
+            self._pascal = 10 ** 5 * kwargs['bar']
             return
 
         raise KeyError()
@@ -45,7 +46,7 @@ class Pressure():
         return self._pascal
 
     def bar(self):
-        return self._pascal / (10**5) 
+        return self._pascal / (10 ** 5)
 
     def __add__(self, other):
         if type(other) is Temperature:
@@ -54,27 +55,28 @@ class Pressure():
         raise TypeError()
 
     def __mul__(self, other):
-        return Pressure(pascal=(other*(self.pascal())))
+        return Pressure(pascal=(other * (self.pascal())))
 
     def __rmul__(self, other):
-        return self*other
+        return self * other
 
     def __repr__(self):
-        return "Pressure: "+str(self.pascal())+"Pa"
+        return "Pressure: " + str(self.pascal()) + "Pa"
+
 
 class Volume:
-    def __init__(self, 
-                 volume = None, # in m^3
-                 r_star = None, # in J / (kg * K)
-                 moles  = None, # in kmoles 
-                 mass   = None, # in kg
-                 temp   = None, # Temperature
-                 press  = None, # Pressure
-                 mol_ma = None):# in kg/kmol, molar mass
+    def __init__(self,
+                 volume=None,  # in m^3
+                 r_star=None,  # in J / (kg * K)
+                 moles=None,  # in kmoles
+                 mass=None,  # in kg
+                 temp=None,  # Temperature
+                 press=None,  # Pressure
+                 mol_ma=None):  # in kg/kmol, molar mass
         if volume is not None:
             self._volume = volume
             return
-        
+
         if r_star is None:
             if moles is not None:
                 pass
@@ -90,7 +92,7 @@ class Volume:
             if mass is None:
                 raise KeyError("Not enough information, no moles and no mass")
             else:
-                JoverKel = r_star*mass
+                JoverKel = r_star * mass
 
         if temp is None:
             raise KeyError("No temperature to determine volume")
@@ -111,12 +113,15 @@ class Gas:
     def c_v(self):
         pass
 
+
 class IdealGas(Gas):
     """
     Contains information on the values
     """
+
     def __init__(self, c_v=None, c_p=None):
         pass
+
 
 class State:
     """
@@ -128,10 +133,11 @@ class State:
         + temperature
         + internal energy
     """
-    def __init__(self, 
-                 gas, 
+
+    def __init__(self,
+                 gas,
                  temperature=None,
-                 volume=None, 
+                 volume=None,
                  pressure=None,
                  entropy=None,
                  enthalpy=None,
@@ -139,7 +145,7 @@ class State:
                  mass=None,
                  internal_energy=None):
         pass
-    
+
     def isocore(self, target_press=None, target_temp=None):
         pass
 
@@ -152,9 +158,7 @@ class State:
     def adiabatic(self, target_press=None, target_vol=None, target_temp=None):
         pass
 
+
 class Transformation:
     def __init__(self, state_1, state_2, d_s, d_h, work):
         pass
-
-
-
