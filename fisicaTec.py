@@ -1,3 +1,5 @@
+from math import log
+
 def cal_to_joule(cal):
     return cal*4.1858
 
@@ -127,3 +129,60 @@ class Volume:
         else:
             return "Specific volume: " + str(self._spec_vol)
 
+
+class Transformation:
+    def __init__(self, 
+                 d_press=None, 
+                 d_temp=None,
+                 d_vol=None, 
+                 work=None, 
+                 heat=None,
+                 d_s=None,
+                 d_h=None):
+        self.d_press = d_press
+        self.d_temp = d_temp
+        self.d_vol = d_vol
+        self.work=work
+        self.heat=heat
+        self.d_s = d_s
+        self.d_h = d_h
+
+    def __repr__(self):
+        s = []
+        s.append(f'pressure change: {self.d_press}')
+        s.append(f'temperature change: {self.d_temp}')
+        s.append(f'volume change: {self.d_vol}')
+        s.append(f'work: {self.work}')
+        s.append(f'heat: {self.heat}')
+        s.append(f'change entropy: {self.d_s}')
+        s.append(f'change hentalpy: {self.d_h}')
+        return '\n'.join(s)
+
+def delta_entropy_perfect_gas(cv=None, cp=None, t_pair=None, 
+                              v_pair=None, p_pair=None, r_star=None):
+    if not any([cp is None, cv is None, v_pair is None, p_pair is None]):
+        return (cp*log(v_pair[1]/v_pair[0])) + (cv*log(p_pair[1]/p_pair[0]))
+    if not any([cp is None, r_star is None, t_pair is None, p_pair is None]):
+        return (cp*log(t_pair[1]/t_pair[0])) - (r_star*log(p_pair[1]/p_pair[0]))
+    if not any([r_star is None, cv is None, v_pair is None, t_pair is None]):
+        return (cv*log(t_pair[1]/t_pair[0])) + (r_star*log(v_pair[1]/v_pair[0]))
+
+class IdealGasTransforms:
+    @staticmethod
+    def isotherm():
+        """
+
+        """
+        pass
+
+    @staticmethod
+    def isobare():
+        pass
+
+    @staticmethod
+    def isocore():
+        pass
+
+    @staticmethod
+    def adiabatic():
+        pass
