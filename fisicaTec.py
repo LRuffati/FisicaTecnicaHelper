@@ -1,3 +1,11 @@
+def cal_to_joule(cal):
+    return cal*4.1858
+
+def interpolation_linear(pair_low, pair_high, target):
+    x_low, y_low = pair_low
+    x_hig, y_hig = pair_high
+    return y_low + ((y_hig-y_low)/(x_hig-x_low))*(target-x_low)
+
 class Temperature:
     def __init__(self, **kwargs):
         if 'kelvin' in kwargs:
@@ -90,8 +98,9 @@ class Volume:
             JoverKel = 8314.0 * moles
         else:
             if mass is None:
-                raise KeyError("Not enough information, no moles and no mass")
+                spec_vol = True
             else:
+                spec_vol = False
                 JoverKel = r_star * mass
 
         if temp is None:
@@ -100,117 +109,21 @@ class Volume:
         if press is None:
             raise KeyError("No pressure to determine volume")
 
-        self._volume = JoverKel * temp.kelvin() / press.pascal()
+        if not spec_vol:
+            self._volume = JoverKel * temp.kelvin() / press.pascal()
+        else:
+            self._spec_vol = r_star * temp.kelvin() / press.pascal()
 
     def cubic_meters(self):
         return self._volume
 
+    def specific_vol(self):
+        return self._spec_vol
 
-class Gas:
-    def c_p(self):
-        pass
+    def __repr__(self):
 
-    def c_v(self):
-        pass
-
-
-class IdealGas(Gas):
-    """
-    Contains information on the values
-    """
-
-    def __init__(self, c_v=None, c_p=None):
-        pass
-
-
-class State:
-    """
-    The state of a gas in the thermodynamics plane
-
-    Should at least have:
-        + pressure
-        + volume
-        + temperature
-        + internal energy
-        + a method to generate PV and TS graphs
-    """
-
-    def __init__(self,
-                 gas,
-                 temperature=None,
-                 volume=None,
-                 pressure=None,
-                 entropy=None,
-                 enthalpy=None,
-                 moles=None,
-                 mass=None,
-                 internal_energy=None):
-        self.gas = gas
-        if temperature is not None:
-            self.temperature = temperature
-
-        if volume is not None:
-            self.volume = volume
-
-        if pressure is not None:
-            self.pressure = pressure
-
-        if entropy is not None:
-            self.entropy = entropy
-
-        if enthalpy is not None:
-            self.enthalpy = enthalpy
-
-        if moles is not None:
-            self.moles = moles
-
-        if mass is not None:
-            self.mass = mass
-
-        if internal_energy is not None:
-            self.internal_energy = internal_energy
-
-    def get_enthalpy(self):
-        if self.enthalpy is None:
-            self.enthalpy = self.internal_energy + (self.volume + self.pressure)
-        return self.enthalpy
-
-    def get_pv(self):
-        pass
-
-    def get_ts(self):
-        pass
-
-    def isocore(self, target_press=None, target_temp=None):
-        pass
-
-    def isobare(self, target_temp=None, target_vol=None):
-        pass
-
-    def isotherm(self, target_press=None, target_vol=None):
-        pass
-
-    def adiabatic(self, target_press=None, target_vol=None, target_temp=None):
-        pass
-
-
-class Transformation:
-    def __init__(self, state_1, state_2, d_sq, d_sirr, d_h, work):
-        self.d_sirr = d_sirr
-        self.d_sq = d_sq
-        self.state_1 = state_1
-        self.state_2 = state_2
-
-    def is_rev(self):
-        if self.d_sirr == 0:
-            return True
-
-    def is_adiab(self):
-        if self.d_sq == 0:
-            return True
-
-    def get_entrop(self):
-        if self.state_1.entropy is None or self.state_2.entropy is None:
-            return self.d_sirr + self.d_sq # se non avessimo uno dei due valori dovremmo considerare la legge coi logaritmi, che casino scegliere le variabili
+        if hasattr(self, '_volume'):
+            return "Volume: "+ str(self._volume)
         else:
-            return self.state_2.entropy - self.state_1.entropy
+            return "Specific volume: " + str(self._spec_vol)
+
